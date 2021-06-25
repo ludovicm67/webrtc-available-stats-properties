@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC Available Stats Properties</title>
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      font-family: sans-serif;
+      color: #212121;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 42px;;
+      background-color: #135aa0;
+      color: #fff;
+      padding: 42px;
+      font-size: 2rem;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+    }
+
+    table {
+      text-align: center;
+      border-collapse: collapse;
+      margin-bottom: 75px;
+    }
+
+    td {
+      border: 1px solid #212121;
+      padding: 16px;
+    }
+
+    .table-left {
+      text-align: left;
+    }
+
+    tr:nth-child(1) {
+      background-color: #212121;
+      color: #fff;
+      font-weight: bold;
+      padding: 32px;
+    }
+
+    tr:nth-child(1) > td:nth-child(1) {
+      border: none;
+      background-color: #fff;
+      color: #212121;
+    }
+
+    tr > td:nth-child(1) {
+      width: 350px;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebRTC <small>Available Stats Properties</small></h1>
+  <div class="container">
+    <div id="render"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script>
+    const devices = {
+      safariMac: {
+        browser: {
+          name: 'Safari',
+          version: '14.0.1',
+        },
+        os: {
+          name: 'macOS',
+          version: '11.0.1 (Big Sur)',
+        },
+      },
+
+      chromeLinux: {
+        browser: {
+          name: 'Chrome',
+          version: '91.0.4472.114',
+        },
+        os: {
+          name: 'Ubuntu',
+          version: '21.04',
+        },
+      },
+
+      firefoxLinux: {
+        browser: {
+          name: 'Firefox',
+          version: '89.0.1',
+        },
+        os: {
+          name: 'Ubuntu',
+          version: '21.04',
+        },
+      },
+    };
+
+    const deviceLookup = (name) => {
+      const deviceElement = document.createElement('div');
+      if (!Object.prototype.hasOwnProperty.call(devices, name)) {
+        deviceElement.innerText = name;
+        return deviceElement;
+      }
+
+      const device = devices[name];
+
+      const bElement = document.createElement('p');
+      bElement.innerText = `${device.browser.name} ${device.browser.version}`;
+      deviceElement.appendChild(bElement);
+
+      const osElement = document.createElement('p');
+      osElement.innerText = `${device.os.name} ${device.os.version}`;
+      deviceElement.appendChild(osElement);
+
+      return deviceElement;
+    };
+
+    const data = {
+      chromeLinux: {"media-source":["audioLevel","frames","framesPerSecond","height","kind","totalAudioEnergy","totalSamplesDuration","trackIdentifier","width"],"certificate":["base64Certificate","fingerprint","fingerprintAlgorithm"],"codec":["channels","clockRate","mimeType","payloadType","sdpFmtpLine","transportId"],"candidate-pair":["availableOutgoingBitrate","bytesReceived","bytesSent","consentRequestsSent","currentRoundTripTime","localCandidateId","nominated","priority","remoteCandidateId","requestsReceived","requestsSent","responsesReceived","responsesSent","state","totalRoundTripTime","transportId","writable"],"local-candidate":["address","candidateType","ip","isRemote","networkType","port","priority","protocol","transportId"],"remote-candidate":["address","candidateType","ip","isRemote","port","priority","protocol","transportId"],"track":["detached","ended","frameHeight","frameWidth","framesSent","hugeFramesSent","kind","mediaSourceId","remoteSource","trackIdentifier"],"stream":["streamIdentifier","trackIds"],"outbound-rtp":["bytesSent","codecId","encoderImplementation","firCount","frameHeight","frameWidth","framesEncoded","framesPerSecond","framesSent","headerBytesSent","hugeFramesSent","keyFramesEncoded","kind","mediaSourceId","mediaType","nackCount","packetsSent","pliCount","qpSum","qualityLimitationReason","qualityLimitationResolutionChanges","remoteId","retransmittedBytesSent","retransmittedPacketsSent","ssrc","totalEncodeTime","totalEncodedBytesTarget","totalPacketSendDelay","trackId","transportId"],"peer-connection":["dataChannelsClosed","dataChannelsOpened"],"remote-inbound-rtp":["codecId","fractionLost","jitter","kind","localId","packetsLost","roundTripTime","roundTripTimeMeasurements","ssrc","totalRoundTripTime","transportId"],"transport":["bytesReceived","bytesSent","dtlsCipher","dtlsState","localCertificateId","packetsReceived","packetsSent","remoteCertificateId","selectedCandidatePairChanges","selectedCandidatePairId","srtpCipher","tlsVersion"]},
+      firefoxLinux: {"candidate-pair":["bytesReceived","bytesSent","lastPacketReceivedTimestamp","lastPacketSentTimestamp","localCandidateId","nominated","priority","readable","remoteCandidateId","selected","state","transportId","writable"],"local-candidate":["address","candidateType","port","priority","protocol"],"remote-candidate":["address","candidateType","port","priority","protocol"],"outbound-rtp":["bitrateMean","bitrateStdDev","bytesSent","droppedFrames","firCount","framerateMean","framerateStdDev","framesEncoded","kind","mediaType","nackCount","packetsSent","pliCount","qpSum","remoteId","ssrc"],"remote-inbound-rtp":["bytesReceived","jitter","kind","localId","mediaType","packetsLost","packetsReceived","roundTripTime","ssrc"]},
+      safariMac: {"media-source":["kind","trackIdentifier"],"certificate":["base64Certificate","fingerprint","fingerprintAlgorithm"],"codec":["channels","clockRate","mimeType","payloadType","sdpFmtpLine"],"candidate-pair":["availableOutgoingBitrate","bytesReceived","bytesSent","currentRoundTripTime","localCandidateId","nominated","priority","remoteCandidateId","requestsReceived","requestsSent","responsesReceived","responsesSent","state","totalRoundTripTime","transportId","writable"],"local-candidate":["candidateType","deleted","port","priority","protocol","transportId"],"remote-candidate":["candidateType","deleted","port","priority","protocol","transportId"],"track":["detached","ended","frameHeight","frameWidth","framesSent","remoteSource","trackIdentifier"],"outbound-rtp":["bytesSent","codecId","firCount","framesEncoded","headerBytesSent","keyFramesEncoded","kind","mediaSourceId","mediaType","nackCount","packetsSent","pliCount","qpSum","remoteId","retransmittedBytesSent","retransmittedPacketsSent","ssrc","totalPacketSendDelay","trackId","transportId"],"peer-connection":["dataChannelsClosed","dataChannelsOpened"],"remote-inbound-rtp":["codecId","kind","localId","mediaType","roundTripTime","ssrc","transportId"],"transport":["bytesReceived","bytesSent","dtlsCipher","dtlsState","localCertificateId","remoteCertificateId","selectedCandidatePairId","srtpCipher","tlsVersion"]},
+    };
+
+    const flatten = Object.entries(data)
+      .map(([browser, stats]) =>
+        Object.entries(stats).map(([report, properties]) => properties.map(property => ({browser, report, property})))).flat().flat();
+
+    const browsers = new Set(flatten.map(({ browser }) => browser));
+    const byReport = _.chain(flatten).groupBy('report').mapValues(report =>
+      _.chain(report).groupBy('property').mapValues(property => {
+        const availableIn = new Set(property.map(r => r.browser));
+        return Object.fromEntries(Array.from(browsers).sort().map(browser => ([browser, availableIn.has(browser)])));
+      }).value()
+    ).value();
+
+
+    const render = document.getElementById('render');
+    Object.entries(byReport).map(([report, properties]) => {
+      const reportTable = document.createElement('table');
+      const firstRow = document.createElement('tr');
+      const reportTitleTable = document.createElement('td');
+      const reportTitle = document.createElement('h2');
+      reportTitle.innerText = report;
+      reportTitleTable.appendChild(reportTitle);
+      firstRow.appendChild(reportTitleTable);
+
+      Array.from(browsers).map((browser) => {
+        const propertySupport = document.createElement('td');
+        propertySupport.appendChild(deviceLookup(browser));
+        firstRow.appendChild(propertySupport);
+      });
+
+      reportTable.appendChild(firstRow);
+
+      Object.entries(properties).map(([property, browserSupport]) => {
+        const tableRow = document.createElement('tr');
+        const propertyTitle = document.createElement('td');
+        propertyTitle.innerText = property;
+        propertyTitle.className = 'table-left';
+        tableRow.appendChild(propertyTitle);
+
+        Object.entries(browserSupport).map(([browser, supported]) => {
+          const propertySupport = document.createElement('td');
+          propertySupport.innerText = supported ? '✅' : '❌';
+          tableRow.appendChild(propertySupport);
+        });
+
+        reportTable.appendChild(tableRow);
+      });
+      render.appendChild(reportTable);
+    });
+
+    console.log(byReport);
+  </script>
+</body>
+</html>
+
