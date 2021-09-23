@@ -69,42 +69,14 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+
+  <!-- this defines `devices` global variable -->
+  <script src="data/devices.js"></script>
+
+  <!-- this defines `data` global variable -->
+  <script src="data/data.js"></script>
+
   <script>
-    const devices = {
-      safariMac: {
-        browser: {
-          name: 'Safari',
-          version: '14.0.1',
-        },
-        os: {
-          name: 'macOS',
-          version: '11.0.1 (Big Sur)',
-        },
-      },
-
-      chromeLinux: {
-        browser: {
-          name: 'Chrome',
-          version: '91.0.4472.114',
-        },
-        os: {
-          name: 'Ubuntu',
-          version: '21.04',
-        },
-      },
-
-      firefoxLinux: {
-        browser: {
-          name: 'Firefox',
-          version: '89.0.1',
-        },
-        os: {
-          name: 'Ubuntu',
-          version: '21.04',
-        },
-      },
-    };
-
     const deviceLookup = (name) => {
       const deviceElement = document.createElement('div');
       if (!Object.prototype.hasOwnProperty.call(devices, name)) {
@@ -118,17 +90,13 @@
       bElement.innerText = `${device.browser.name} ${device.browser.version}`;
       deviceElement.appendChild(bElement);
 
-      const osElement = document.createElement('p');
-      osElement.innerText = `${device.os.name} ${device.os.version}`;
-      deviceElement.appendChild(osElement);
+      if (device.os) {
+        const osElement = document.createElement('p');
+        osElement.innerText = `${device.os.name} ${device.os.version}`;
+        deviceElement.appendChild(osElement);
+      }
 
       return deviceElement;
-    };
-
-    const data = {
-      chromeLinux: {"media-source":["audioLevel","frames","framesPerSecond","height","kind","totalAudioEnergy","totalSamplesDuration","trackIdentifier","width"],"certificate":["base64Certificate","fingerprint","fingerprintAlgorithm"],"codec":["channels","clockRate","mimeType","payloadType","sdpFmtpLine","transportId"],"candidate-pair":["availableOutgoingBitrate","bytesReceived","bytesSent","consentRequestsSent","currentRoundTripTime","localCandidateId","nominated","priority","remoteCandidateId","requestsReceived","requestsSent","responsesReceived","responsesSent","state","totalRoundTripTime","transportId","writable"],"local-candidate":["address","candidateType","ip","isRemote","networkType","port","priority","protocol","transportId"],"remote-candidate":["address","candidateType","ip","isRemote","port","priority","protocol","transportId"],"track":["detached","ended","frameHeight","frameWidth","framesSent","hugeFramesSent","kind","mediaSourceId","remoteSource","trackIdentifier"],"stream":["streamIdentifier","trackIds"],"outbound-rtp":["bytesSent","codecId","encoderImplementation","firCount","frameHeight","frameWidth","framesEncoded","framesPerSecond","framesSent","headerBytesSent","hugeFramesSent","keyFramesEncoded","kind","mediaSourceId","mediaType","nackCount","packetsSent","pliCount","qpSum","qualityLimitationReason","qualityLimitationResolutionChanges","remoteId","retransmittedBytesSent","retransmittedPacketsSent","ssrc","totalEncodeTime","totalEncodedBytesTarget","totalPacketSendDelay","trackId","transportId"],"peer-connection":["dataChannelsClosed","dataChannelsOpened"],"remote-inbound-rtp":["codecId","fractionLost","jitter","kind","localId","packetsLost","roundTripTime","roundTripTimeMeasurements","ssrc","totalRoundTripTime","transportId"],"transport":["bytesReceived","bytesSent","dtlsCipher","dtlsState","localCertificateId","packetsReceived","packetsSent","remoteCertificateId","selectedCandidatePairChanges","selectedCandidatePairId","srtpCipher","tlsVersion"]},
-      firefoxLinux: {"candidate-pair":["bytesReceived","bytesSent","lastPacketReceivedTimestamp","lastPacketSentTimestamp","localCandidateId","nominated","priority","readable","remoteCandidateId","selected","state","transportId","writable"],"local-candidate":["address","candidateType","port","priority","protocol"],"remote-candidate":["address","candidateType","port","priority","protocol"],"outbound-rtp":["bitrateMean","bitrateStdDev","bytesSent","droppedFrames","firCount","framerateMean","framerateStdDev","framesEncoded","kind","mediaType","nackCount","packetsSent","pliCount","qpSum","remoteId","ssrc"],"remote-inbound-rtp":["bytesReceived","jitter","kind","localId","mediaType","packetsLost","packetsReceived","roundTripTime","ssrc"]},
-      safariMac: {"media-source":["kind","trackIdentifier"],"certificate":["base64Certificate","fingerprint","fingerprintAlgorithm"],"codec":["channels","clockRate","mimeType","payloadType","sdpFmtpLine"],"candidate-pair":["availableOutgoingBitrate","bytesReceived","bytesSent","currentRoundTripTime","localCandidateId","nominated","priority","remoteCandidateId","requestsReceived","requestsSent","responsesReceived","responsesSent","state","totalRoundTripTime","transportId","writable"],"local-candidate":["candidateType","deleted","port","priority","protocol","transportId"],"remote-candidate":["candidateType","deleted","port","priority","protocol","transportId"],"track":["detached","ended","frameHeight","frameWidth","framesSent","remoteSource","trackIdentifier"],"outbound-rtp":["bytesSent","codecId","firCount","framesEncoded","headerBytesSent","keyFramesEncoded","kind","mediaSourceId","mediaType","nackCount","packetsSent","pliCount","qpSum","remoteId","retransmittedBytesSent","retransmittedPacketsSent","ssrc","totalPacketSendDelay","trackId","transportId"],"peer-connection":["dataChannelsClosed","dataChannelsOpened"],"remote-inbound-rtp":["codecId","kind","localId","mediaType","roundTripTime","ssrc","transportId"],"transport":["bytesReceived","bytesSent","dtlsCipher","dtlsState","localCertificateId","remoteCertificateId","selectedCandidatePairId","srtpCipher","tlsVersion"]},
     };
 
     const flatten = Object.entries(data)
@@ -142,7 +110,6 @@
         return Object.fromEntries(Array.from(browsers).sort().map(browser => ([browser, availableIn.has(browser)])));
       }).value()
     ).value();
-
 
     const render = document.getElementById('render');
     Object.entries(byReport).map(([report, properties]) => {
