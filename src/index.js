@@ -10,7 +10,7 @@ const runBrowser = async (browser) => {
   const instance = await browser.browser.launch(browser.options);
   const page = await instance.newPage({permissions: browser.permissions});
   await page.goto(url);
-  await waitSeconds(5);
+  await waitSeconds(3);
   const stats = await page.evaluate(() => JSON.stringify(getStatsProperties()));
   const version = instance.version();
   await instance.close();
