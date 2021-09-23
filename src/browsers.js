@@ -2,7 +2,7 @@ const { chromium, firefox } = require("playwright");
 
 const browsers = [
   {
-    name: "chromium",
+    name: "Chromium",
     browser: chromium,
     options: {
       headless: true,
@@ -14,7 +14,7 @@ const browsers = [
     permissions: ["camera", "microphone"],
   },
   {
-    name: "firefox",
+    name: "Firefox",
     browser: firefox,
     options: {
       headless: true,
