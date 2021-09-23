@@ -54,20 +54,28 @@ const deviceFromResult = (r) => {
     data[`${key}`] = JSON.parse(r.stats);
   });
 
-  // create generated files
+  // create directory where generated files will be created
   if (!fs.existsSync(`${generatedDirectory}/data`)) {
     fs.mkdirSync(`${generatedDirectory}/data`, { recursive: true });
   }
-  fs.createReadStream("index.html").pipe(
-    fs.createWriteStream(`${generatedDirectory}/index.html`)
-  );
+
+  // copy static files
+  ["index.html", "style.css"].forEach((filename) => {
+    fs.createReadStream(filename).pipe(
+      fs.createWriteStream(`${generatedDirectory}/${filename}`)
+    );
+  })
+
+  // create file for devices
   const devicesStream = fs.createWriteStream(
     `${generatedDirectory}/data/devices.js`
   );
-  const dataStream = fs.createWriteStream(`${generatedDirectory}/data/data.js`);
   devicesStream.write(`const devices = ${JSON.stringify(devices)};`);
-  dataStream.write(`const data = ${JSON.stringify(data)};`);
   devicesStream.end();
+
+  // create file for data
+  const dataStream = fs.createWriteStream(`${generatedDirectory}/data/data.js`);
+  dataStream.write(`const data = ${JSON.stringify(data)};`);
   dataStream.end();
 
   // print results in the console
