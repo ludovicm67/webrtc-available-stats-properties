@@ -1,0 +1,33 @@
+{
+  "name": "webrtc-available-stats-properties",
+  "version": "0.1.0",
+  "description": "List all available properties per browser for getStats",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ludovicm67/webrtc-available-stats-properties.git"
+  },
+  "keywords": [
+    "webrtc",
+    "stats",
+    "properties",
+    "getStats",
+    "browser"
+  ],
+  "author": {
+    "name": "Ludovic Muller",
+    "url": "https://ludovic-muller.fr/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ludovicm67/webrtc-available-stats-properties/issues"
+  },
+  "homepage": "https://github.com/ludovicm67/webrtc-available-stats-properties#readme",
+  "dependencies": {
+    "playwright": "^1.15.0"
+  }
+}
