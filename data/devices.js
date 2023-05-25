@@ -1,1 +1,1 @@
-const devices = {"chromium1050519519":{"browser":{"name":"Chromium","version":"105.0.5195.19"}},"firefox1030":{"browser":{"name":"Firefox","version":"103.0"}}};
+const devices = {"chromium1140573535":{"browser":{"name":"Chromium","version":"114.0.5735.35"}},"firefox1130":{"browser":{"name":"Firefox","version":"113.0"}}};
