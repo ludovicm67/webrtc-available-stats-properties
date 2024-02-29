@@ -1,6 +1,6 @@
-FROM docker.io/library/node:16-bullseye
+FROM docker.io/library/node:20-bookworm
 
-# install required dependencies
+# Install required dependencies
 RUN apt-get update && apt-get install -y \
   libgtk-3-0 \
   libnss3 \
@@ -13,10 +13,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# install the app
+# Install the app
 COPY package.json package-lock.json ./
 RUN npm ci
+RUN npx playwright install
 COPY . .
 
-# run the app
+# Run the app
 CMD ["npm", "run", "start"]
