@@ -1,97 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebRTC Available Stats Properties</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>WebRTC <small>Available Stats Properties</small></h1>
-  <div class="container">
-    <div id="render"></div>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC Available Stats Properties</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>WebRTC <small>Available Stats Properties</small></h1>
+      </div>
+    </header>
+    <div class="container">
+      <div id="render"></div>
+    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <footer>
+      <div class="container">
+        <p>
+          ©
+          <a
+            href="https://ludovic-muller.fr/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Ludovic Muller</a
+          >
+          <!-- LAST_UPDATE -->
+        </p>
+      </div>
+    </footer>
 
-  <!-- this defines `devices` global variable -->
-  <script src="data/devices.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 
-  <!-- this defines `data` global variable -->
-  <script src="data/data.js"></script>
+    <!-- this defines `devices` global variable -->
+    <script src="data/devices.js"></script>
 
-  <script>
-    const deviceLookup = (name) => {
-      const deviceElement = document.createElement('div');
-      if (!Object.prototype.hasOwnProperty.call(devices, name)) {
-        deviceElement.innerText = name;
+    <!-- this defines `data` global variable -->
+    <script src="data/data.js"></script>
+
+    <script>
+      const deviceLookup = (name) => {
+        const deviceElement = document.createElement("div");
+        if (!Object.prototype.hasOwnProperty.call(devices, name)) {
+          deviceElement.innerText = name;
+          return deviceElement;
+        }
+
+        const device = devices[name];
+
+        const bElement = document.createElement("p");
+        bElement.innerText = `${device.browser.name} ${device.browser.version}`;
+        deviceElement.appendChild(bElement);
+
+        if (device.os) {
+          const osElement = document.createElement("p");
+          osElement.innerText = `${device.os.name} ${device.os.version}`;
+          deviceElement.appendChild(osElement);
+        }
+
         return deviceElement;
-      }
+      };
 
-      const device = devices[name];
+      const flatten = Object.entries(data)
+        .map(([browser, stats]) =>
+          Object.entries(stats).map(([report, properties]) =>
+            properties.map((property) => ({ browser, report, property }))
+          )
+        )
+        .flat()
+        .flat();
 
-      const bElement = document.createElement('p');
-      bElement.innerText = `${device.browser.name} ${device.browser.version}`;
-      deviceElement.appendChild(bElement);
+      const browsers = new Set(flatten.map(({ browser }) => browser));
+      const byReport = _.chain(flatten)
+        .groupBy("report")
+        .mapValues((report) =>
+          _.chain(report)
+            .groupBy("property")
+            .mapValues((property) => {
+              const availableIn = new Set(property.map((r) => r.browser));
+              return Object.fromEntries(
+                Array.from(browsers)
+                  .sort()
+                  .map((browser) => [browser, availableIn.has(browser)])
+              );
+            })
+            .value()
+        )
+        .value();
 
-      if (device.os) {
-        const osElement = document.createElement('p');
-        osElement.innerText = `${device.os.name} ${device.os.version}`;
-        deviceElement.appendChild(osElement);
-      }
+      const render = document.getElementById("render");
+      Object.entries(byReport).map(([report, properties]) => {
+        const reportTable = document.createElement("table");
+        const firstRow = document.createElement("tr");
+        const reportTitleTable = document.createElement("td");
+        const reportTitle = document.createElement("h2");
+        reportTitle.innerText = report;
+        reportTitleTable.appendChild(reportTitle);
+        firstRow.appendChild(reportTitleTable);
 
-      return deviceElement;
-    };
-
-    const flatten = Object.entries(data)
-      .map(([browser, stats]) =>
-        Object.entries(stats).map(([report, properties]) => properties.map(property => ({browser, report, property})))).flat().flat();
-
-    const browsers = new Set(flatten.map(({ browser }) => browser));
-    const byReport = _.chain(flatten).groupBy('report').mapValues(report =>
-      _.chain(report).groupBy('property').mapValues(property => {
-        const availableIn = new Set(property.map(r => r.browser));
-        return Object.fromEntries(Array.from(browsers).sort().map(browser => ([browser, availableIn.has(browser)])));
-      }).value()
-    ).value();
-
-    const render = document.getElementById('render');
-    Object.entries(byReport).map(([report, properties]) => {
-      const reportTable = document.createElement('table');
-      const firstRow = document.createElement('tr');
-      const reportTitleTable = document.createElement('td');
-      const reportTitle = document.createElement('h2');
-      reportTitle.innerText = report;
-      reportTitleTable.appendChild(reportTitle);
-      firstRow.appendChild(reportTitleTable);
-
-      Array.from(browsers).map((browser) => {
-        const propertySupport = document.createElement('td');
-        propertySupport.appendChild(deviceLookup(browser));
-        firstRow.appendChild(propertySupport);
-      });
-
-      reportTable.appendChild(firstRow);
-
-      Object.entries(properties).map(([property, browserSupport]) => {
-        const tableRow = document.createElement('tr');
-        const propertyTitle = document.createElement('td');
-        propertyTitle.innerText = property;
-        propertyTitle.className = 'table-left';
-        tableRow.appendChild(propertyTitle);
-
-        Object.entries(browserSupport).map(([browser, supported]) => {
-          const propertySupport = document.createElement('td');
-          propertySupport.innerText = supported ? '✅' : '❌';
-          tableRow.appendChild(propertySupport);
+        Array.from(browsers).map((browser) => {
+          const propertySupport = document.createElement("td");
+          propertySupport.appendChild(deviceLookup(browser));
+          firstRow.appendChild(propertySupport);
         });
 
-        reportTable.appendChild(tableRow);
-      });
-      render.appendChild(reportTable);
-    });
-  </script>
-</body>
-</html>
+        reportTable.appendChild(firstRow);
 
+        Object.entries(properties).map(([property, browserSupport]) => {
+          const tableRow = document.createElement("tr");
+          const propertyTitle = document.createElement("td");
+          propertyTitle.innerText = property;
+          propertyTitle.className = "table-left";
+          tableRow.appendChild(propertyTitle);
+
+          Object.entries(browserSupport).map(([browser, supported]) => {
+            const propertySupport = document.createElement("td");
+            propertySupport.innerText = supported ? "✅" : "❌";
+            tableRow.appendChild(propertySupport);
+          });
+
+          reportTable.appendChild(tableRow);
+        });
+        render.appendChild(reportTable);
+      });
+    </script>
+  </body>
+</html>

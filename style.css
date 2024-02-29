@@ -6,13 +6,26 @@ body {
   color: #212121;
 }
 
-h1 {
+header {
   margin-top: 0;
-  margin-bottom: 42px;
+  margin-bottom: 64px;
   background-color: #135aa0;
   color: #fff;
   padding: 42px;
-  font-size: 2rem;
+  font-size: 1.5rem;
+}
+
+footer {
+  margin-top: 42px;
+  background-color: #135aa0;
+  color: #fff;
+  padding: 24px;
+  font-size: 1rem;
+}
+
+footer a {
+  color: #fff;
+  text-decoration: underline;
 }
 
 .container {

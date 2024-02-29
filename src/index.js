@@ -1,4 +1,4 @@
-import fs from "fs";
+import { readFile, writeFile, mkdir } from "fs/promises";
 import { browsers } from "./browsers.js";
 
 const waitSeconds = async (seconds) => {
@@ -40,12 +40,19 @@ const deviceFromResult = (r) => {
   };
 };
 
+const copyFiles = async (filesToCopy, destination) => {
+  for (const filename of filesToCopy) {
+    const content = await readFile(filename);
+    await writeFile(`${destination}/${filename}`, content);
+  }
+};
+
 const main = async () => {
   const results = await Promise.all(
     browsers.map((browser) => runBrowser(browser))
   );
 
-  // create devices list
+  // Create devices list
   const devices = {};
   const data = {};
   results.forEach((r) => {
@@ -54,31 +61,42 @@ const main = async () => {
     data[`${key}`] = JSON.parse(r.stats);
   });
 
-  // create directory where generated files will be created
-  if (!fs.existsSync(`${generatedDirectory}/data`)) {
-    fs.mkdirSync(`${generatedDirectory}/data`, { recursive: true });
-  }
+  // Create directory where generated files will be created
+  await mkdir(generatedDirectory, { recursive: true });
 
-  // copy static files
-  ["index.html", "style.css"].forEach((filename) => {
-    fs.createReadStream(filename).pipe(
-      fs.createWriteStream(`${generatedDirectory}/${filename}`)
-    );
-  })
+  // Copy static files
+  await copyFiles(["index.html", "style.css"], generatedDirectory);
 
-  // create file for devices
-  const devicesStream = fs.createWriteStream(
-    `${generatedDirectory}/data/devices.js`
-  );
-  devicesStream.write(`const devices = ${JSON.stringify(devices)};`);
-  devicesStream.end();
+  // Create file for devices
+  await writeFile(`${generatedDirectory}/data/devices.js`, `const devices = ${JSON.stringify(devices)};`);
 
-  // create file for data
-  const dataStream = fs.createWriteStream(`${generatedDirectory}/data/data.js`);
-  dataStream.write(`const data = ${JSON.stringify(data)};`);
-  dataStream.end();
+  // Create file for data
+  await writeFile(`${generatedDirectory}/data/data.js`, `const data = ${JSON.stringify(data)};`);
 
-  // print results in the console
+  // Update the index.html file to include the updated date
+
+  /// Read the file content
+  const indexPath = `${generatedDirectory}/index.html`;
+  let content = await readFile(indexPath, 'utf8');
+
+  /// Get current date and time in UTC
+  const now = new Date();
+  const day = String(now.getUTCDate()).padStart(2, '0');
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0'); // Months start at 0
+  const year = now.getUTCFullYear();
+  const hours = String(now.getUTCHours()).padStart(2, '0');
+  const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+
+  /// Format the date as day/month/year hour:minute
+  const formattedDate = ` - Last update: ${day}/${month}/${year} ${hours}:${minutes} (UTC)`;
+
+  /// Replace the placeholder with the current date and time
+  content = content.replace('<!-- LAST_UPDATE -->', formattedDate);
+
+  /// Write the updated content back to the file
+  await writeFile(indexPath, content);
+
+  // Print results in the console
   console.log(results);
 };
 
