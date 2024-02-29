@@ -62,7 +62,7 @@ const main = async () => {
   });
 
   // Create directory where generated files will be created
-  await mkdir(generatedDirectory, { recursive: true });
+  await mkdir(`${generatedDirectory}/data`, { recursive: true });
 
   // Copy static files
   await copyFiles(["index.html", "style.css"], generatedDirectory);
