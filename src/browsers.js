@@ -1,6 +1,6 @@
-const { chromium, firefox } = require("playwright");
+import { chromium, firefox } from "playwright";
 
-const browsers = [
+export const browsers = [
   {
     name: "Chromium",
     browser: chromium,
@@ -26,5 +26,3 @@ const browsers = [
     permissions: [],
   },
 ];
-
-module.exports = browsers;

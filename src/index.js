@@ -1,5 +1,5 @@
-const fs = require("fs");
-const browsers = require("./browsers");
+import fs from "fs";
+import { browsers } from "./browsers.js";
 
 const waitSeconds = async (seconds) => {
   await new Promise((r) => setTimeout(r, seconds * 1000));
@@ -40,7 +40,7 @@ const deviceFromResult = (r) => {
   };
 };
 
-(async () => {
+const main = async () => {
   const results = await Promise.all(
     browsers.map((browser) => runBrowser(browser))
   );
@@ -80,4 +80,6 @@ const deviceFromResult = (r) => {
 
   // print results in the console
   console.log(results);
-})();
+};
+
+await main();
