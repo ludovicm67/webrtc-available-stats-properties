@@ -33,6 +33,14 @@ td {
   padding: 16px;
 }
 
+tr:nth-child(odd) {
+  background-color: #eaeaea;
+}
+
+tr:hover {
+  background-color: #dadada;
+}
+
 .table-left {
   text-align: left;
 }
