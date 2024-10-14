@@ -29,6 +29,6 @@
   },
   "homepage": "https://github.com/ludovicm67/webrtc-available-stats-properties#readme",
   "dependencies": {
-    "playwright": "^1.47.2"
+    "playwright": "^1.48.0"
   }
 }
